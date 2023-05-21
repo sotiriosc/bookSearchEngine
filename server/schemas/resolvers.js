@@ -1,9 +1,14 @@
-const resolvers = {
-    Query: {
-      user: async (parent, args, context, info) => {
-        return await User.findOne({ $or: [{ _id: args.id }, { username: args.username }] });
-      },
-    },
+const { ApolloServer, gql, AuthenticationError } = require('apollo-server');
+const { User, Profile } = require('../models');
+const { signToken } = require('../utils/auth');
+
+    const resolvers = {
+        Query: {
+          user: async (parent, args, context, info) => {
+            if (!context.user) throw new AuthenticationError('You need to be logged in!');
+            return await User.findOne({ $or: [{ _id: args.id }, { username: args.username }] });
+          },
+        },
     Mutation: {
       login: async (parent, args, context, info) => {
         const user = await User.findOne({ $or: [{ username: args.username }, { email: args.email }] });
