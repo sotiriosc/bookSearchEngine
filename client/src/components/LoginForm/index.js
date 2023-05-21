@@ -2,18 +2,9 @@ import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
 import { gql, useMutation } from '@apollo/client';
 import Auth from '../../utils/auth';
+import { LOGIN_USER } from '../../utils/mutations';
 
-const LOGIN_USER = gql`
-  mutation Login($email: String!, $password: String!) {
-    login(email: $email, password: $password) {
-      token
-      user {
-        _id
-        username
-      }
-    }
-  }
-`;
+  
 
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
