@@ -3,6 +3,7 @@ const { User } = require('../models');
 const { signToken } = require('../utils/auth');
 const { searchGoogleBooks } = require('../utils/googleBooks'); // Import the searchGoogleBooks function
 const { typeDefs } = require('./typeDefs');
+const fetch = require('node-fetch'); // Import the fetch library
 
 const resolvers = {
   Query: {
@@ -10,21 +11,16 @@ const resolvers = {
       if (!context.user) throw new AuthenticationError('You need to be logged in!');
       return await User.findOne({ $or: [{ _id: args.id }, { username: args.username }] });
     },
+   
     searchBooks: async (_, { query }) => {
-      console.log(query);
       try {
-        const endpoint = 'https://www.googleapis.com/books/v1/volumes'; // Specify the API endpoint URL
-        const url = `${endpoint}?q=${query}`; // Construct the complete URL with the query parameter
+        const endpoint = 'https://www.googleapis.com/books/v1/volumes';
+        const url = `${endpoint}?q=${query}`;
     
-        const response = await searchGoogleBooks(url);
+        const response = await fetch(url);
         const data = await response.json();
-        console.log(data);
-        console.log(response.status);
-        console.log(response.headers);
-        console.log(response.text());
-
+    
         const books = data.items.map((item) => {
-          // Extract relevant book information from the response
           const book = {
             bookId: item.id,
             title: item.volumeInfo.title,
@@ -34,13 +30,17 @@ const resolvers = {
           };
           return book;
         });
+    
         return books;
       } catch (err) {
-        console.error(err);
+        console.error('Error:', err);
         throw new Error('Failed to fetch book data from the external API.');
       }
     },
   },
+
+  
+
   Mutation: {
     login: async (parent, args, context, info) => {
       const user = await User.findOne({ $or: [{ username: args.username }, { email: args.email }] });
