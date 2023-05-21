@@ -13,7 +13,6 @@ export const GET_ME = gql`
         description
         title
         image
-        link
       }
     }
   }
@@ -27,7 +26,6 @@ export const SEARCH_BOOKS = gql`
       description
       title
       image
-      link
     }
   }
 `;
