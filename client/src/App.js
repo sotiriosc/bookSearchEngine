@@ -7,7 +7,7 @@ import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:3000/graphql', // replace with your GraphQL server's URI
+  uri: 'http://localhost:3001/graphql', // Update the URL to your server's URL
   cache: new InMemoryCache(),
 });
 
