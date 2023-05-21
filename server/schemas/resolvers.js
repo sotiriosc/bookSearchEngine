@@ -11,9 +11,18 @@ const resolvers = {
       return await User.findOne({ $or: [{ _id: args.id }, { username: args.username }] });
     },
     searchBooks: async (_, { query }) => {
+      console.log(query);
       try {
-        const response = await searchGoogleBooks(query);
+        const endpoint = 'https://www.googleapis.com/books/v1/volumes'; // Specify the API endpoint URL
+        const url = `${endpoint}?q=${query}`; // Construct the complete URL with the query parameter
+    
+        const response = await searchGoogleBooks(url);
         const data = await response.json();
+        console.log(data);
+        console.log(response.status);
+        console.log(response.headers);
+        console.log(response.text());
+
         const books = data.items.map((item) => {
           // Extract relevant book information from the response
           const book = {
