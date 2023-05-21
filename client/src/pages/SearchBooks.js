@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useMutation, useQuery } from '@apollo/client';
 import {
   Container,
   Col,
@@ -8,8 +9,9 @@ import {
   Row
 } from 'react-bootstrap';
 
+import { SAVE_BOOK } from '../utils/mutations';
+import { SEARCH_BOOKS } from '../utils/queries';
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
@@ -22,42 +24,20 @@ const SearchBooks = () => {
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
   useEffect(() => {
     return () => saveBookIds(savedBookIds);
   });
 
-  // create method to search for books and set state on form submit
-  const handleFormSubmit = async (event) => {
-    event.preventDefault();
+  const [saveBook] = useMutation(SAVE_BOOK);
+  const { data: searchBooksData } = useQuery(SEARCH_BOOKS, {
+    variables: { searchInput }
+  });
 
-    if (!searchInput) {
-      return false;
+  useEffect(() => {
+    if (searchBooksData) {
+      setSearchedBooks(searchBooksData.searchBooks);
     }
-
-    try {
-      const response = await searchGoogleBooks(searchInput);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
-
-      const { items } = await response.json();
-
-      const bookData = items.map((book) => ({
-        bookId: book.id,
-        authors: book.volumeInfo.authors || ['No author to display'],
-        title: book.volumeInfo.title,
-        description: book.volumeInfo.description,
-        image: book.volumeInfo.imageLinks?.thumbnail || '',
-      }));
-
-      setSearchedBooks(bookData);
-      setSearchInput('');
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  }, [searchBooksData]);
 
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
@@ -72,11 +52,12 @@ const SearchBooks = () => {
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
-
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
+      await saveBook({
+        variables: { book: bookToSave },
+        update: cache => {
+          cache.writeQuery({ query: SEARCH_BOOKS, data: { searchBooks: searchedBooks } });
+        }
+      });
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
@@ -90,7 +71,7 @@ const SearchBooks = () => {
       <div className='text-light bg-dark pt-5'>
         <Container>
           <h1>Search for Books!</h1>
-          <Form onSubmit={handleFormSubmit}>
+          <Form onSubmit={(e) => e.preventDefault()}>
             <Row>
               <Col xs={12} md={8}>
                 <Form.Control
