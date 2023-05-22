@@ -1,6 +1,7 @@
 const { gql } = require('apollo-server-express');
 
 // create type definitions
+// typeDefs is a template literal tag, so it will be parsed into an abstract syntax tree
 const typeDefs = gql`
 type User {
   _id: ID

@@ -5,7 +5,7 @@ const { authMiddleware } = require('./utils/auth');
 const { typeDefs, resolvers } = require('./schemas');
 const db = require('./config/connection');
 
-
+// Set up Apollo Server
 const app = express();
 const PORT = process.env.PORT || 3001;
 const server = new ApolloServer({
@@ -22,7 +22,7 @@ app.use(express.json());
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, '../client/build')));
 }
-
+// Direct all other traffic to the index.html file in the client/build directory
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });

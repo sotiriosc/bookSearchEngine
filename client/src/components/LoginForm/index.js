@@ -1,27 +1,29 @@
 import React, { useState } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-import { gql, useMutation } from '@apollo/client';
+import { useMutation } from '@apollo/client';
 import Auth from '../../utils/auth';
 import { LOGIN_USER } from '../../utils/mutations';
 
   
-
+// LoginForm component
+// The LoginForm component will be responsible for rendering the login form.
 const LoginForm = () => {
   const [userFormData, setUserFormData] = useState({ email: '', password: '' });
   const [showAlert, setShowAlert] = useState(false);
 
   const [login, { error }] = useMutation(LOGIN_USER, {
     onCompleted(data) {
-      const { token, user } = data.login;
+      const { token } = data.login;
       Auth.login(token);
     }
   });
 
+  // handleInputChange() will be responsible for updating the state based on what a user types into the form.
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setUserFormData({ ...userFormData, [name]: value });
   };
-
+// handleFormSubmit() will be responsible for executing the loginUser mutation with the form data.
   const handleFormSubmit = async (event) => {
     event.preventDefault();
   
@@ -33,7 +35,7 @@ const LoginForm = () => {
   
     } catch (e) {
       console.error(e);
-      setShowAlert(true);
+      setShowAlert();
     }
   };
   

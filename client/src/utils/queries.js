@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-
+// Here we define the queries we will be sending to the GraphQL server
 export const GET_ME = gql`
   query me {
     me {

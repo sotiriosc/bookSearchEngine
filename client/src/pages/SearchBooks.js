@@ -79,10 +79,9 @@ const SearchBooks = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    
+
     // Call the searchBooks query with the searchInput variable
     searchBooks({ variables: { query: searchInput } });
-    
   };
 
   return (
@@ -121,7 +120,7 @@ const SearchBooks = () => {
         <Row>
         {searchedBooks.map((book) => {
   // Limit the description to 150 words
-  const limitedDescription = limitDescriptionToNWords(book.description, 75);
+  const limitedDescription = limitDescriptionToNWords(book.description, 50);
   return (
     <Col xs={12} md={4} key={book.bookId}>
       <Card className='my-3 p-3 rounded'>

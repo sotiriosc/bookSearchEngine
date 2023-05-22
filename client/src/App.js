@@ -6,6 +6,8 @@ import SearchBooks from './pages/SearchBooks';
 import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
+
+// The ApolloProvider component wraps the entire application and allows us to share data between all of the components that we will create
 const client = new ApolloClient({
   uri: 'http://localhost:3001/graphql',
   cache: new InMemoryCache(),
@@ -14,7 +16,7 @@ const client = new ApolloClient({
   }
 });
 
-
+// Here we creating the set of routes for the application
 function App() {
   return (
     <ApolloProvider client={client}>

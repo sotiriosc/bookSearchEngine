@@ -12,6 +12,7 @@ const SignupForm = () => {
   const [validated] = useState(false);
   // set state for alert
   const [showAlert, setShowAlert] = useState(false);
+  
 
   const [addUser, { error }] = useMutation(ADD_USER);
 
@@ -23,12 +24,14 @@ const SignupForm = () => {
   const handleFormSubmit = async (event) => {
     event.preventDefault();
   
+    // clear any previous errors
+    setShowAlert(false);
+  
     try {
       const { data } = await addUser({
         variables: { ...userFormData },
       });
   
-      // Make sure that createUser is indeed returned in the response
       if (data?.addUser) {
         const { token } = data.addUser;
         Auth.login(token);
@@ -39,8 +42,7 @@ const SignupForm = () => {
       console.error(e);
       setShowAlert(true);
     }
-    
-    
+  
     setUserFormData({ username: '', email: '', password: '' });
   };
   
