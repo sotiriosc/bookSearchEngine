@@ -14,6 +14,11 @@ import { SEARCH_BOOKS } from '../utils/queries';
 import Auth from '../utils/auth';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
+// This helper function will limit the string to the specified word limit
+const limitDescriptionToNWords = (str, wordLimit) => {
+  return str.split(' ', wordLimit).join(' ');
+};
+
 const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
@@ -74,9 +79,10 @@ const SearchBooks = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-
+    
     // Call the searchBooks query with the searchInput variable
     searchBooks({ variables: { query: searchInput } });
+    
   };
 
   return (
@@ -113,39 +119,41 @@ const SearchBooks = () => {
             : 'Search for a book to begin'}
         </h2>
         <Row>
-          {searchedBooks.map((book) => {
-            return (
-              <Col xs={12} md={4} key={book.bookId}>
-                <Card className='my-3 p-3 rounded'>
-                  {book.image ? (
-                    <Card.Img src={book.image} variant='top' />
-                  ) : null}
-                  <Card.Body>
-                    <Card.Title as='div'>
-                      <strong>{book.title}</strong>
-                    </Card.Title>
-                    <Card.Text as='div'>
-                      <strong>Authors:</strong> {book.authors.join(', ')}
-                    </Card.Text>
-                    <Card.Text as='div'>
-                      <strong>Description:</strong> {book.description}
-                    </Card.Text>
-                    
-                    <Button
-                      disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
-                      className='btn-block btn-info'
-                      onClick={() => handleSaveBook(book)}> {/* Pass the entire book object */}
-                      {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
-                     ? 'This book has already been saved!'
-                      : 'Save this Book!'}
-                  </Button>
+        {searchedBooks.map((book) => {
+  // Limit the description to 150 words
+  const limitedDescription = limitDescriptionToNWords(book.description, 75);
+  return (
+    <Col xs={12} md={4} key={book.bookId}>
+      <Card className='my-3 p-3 rounded'>
+        {book.image ? (
+          <Card.Img src={book.image} variant='top' />
+        ) : null}
+        <Card.Body>
+          <Card.Title as='div'>
+            <strong>{book.title}</strong>
+          </Card.Title>
+          <Card.Text as='div'>
+            <strong>Authors:</strong> {book.authors.join(', ')}
+          </Card.Text>
+          <Card.Text as='div'>
+            <strong>Description:</strong> {limitedDescription} {/* Use the limited description here */}
+          </Card.Text>
+          
+          <Button
+            disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
+            className='btn-block btn-info'
+            onClick={() => handleSaveBook(book)}> {/* Pass the entire book object */}
+            {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
+           ? 'This book has already been saved!'
+            : 'Save this Book!'}
+        </Button>
 
-                  </Card.Body>
-                </Card>
-              </Col>
-            );
-          }
-          )};
+        </Card.Body>
+      </Card>
+    </Col>
+  );
+}
+)};
         </Row>
       </Container>
     </>
