@@ -87,17 +87,24 @@ const resolvers = {
       throw new Error('You need to be logged in!');
     },
     
-    removeBook: async (parent, args, context, info) => {
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: args.userId },
-        { $pull: { savedBooks: { bookId: args.bookId } } },
-        { new: true }
-      );
-      if (!updatedUser) {
-        throw new Error("Couldn't find user with this id!");
+    removeBook: async (parent, { bookId }, context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $pull: { savedBooks: { bookId } } },
+          { new: true }
+        );
+    
+        if (updatedUser) {
+          return updatedUser;
+        } else {
+          throw new Error("Couldn't find user with this id!");
+        }
       }
-      return updatedUser;
+    
+      throw new AuthenticationError('You need to be logged in!');
     },
+    
   },
 };
 
