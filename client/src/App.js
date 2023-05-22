@@ -9,6 +9,14 @@ import Navbar from './components/Navbar';
 const client = new ApolloClient({
   uri: 'http://localhost:3001/graphql', // Update the URL to your server's URL
   cache: new InMemoryCache(),
+  request: (operation) => {
+    const token = localStorage.getItem('token');
+    operation.setContext({
+      headers: {
+        Authorization: token ? `Bearer ${token}` : '',
+      },
+    });
+  },
 });
 
 function App() {

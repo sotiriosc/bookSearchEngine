@@ -42,37 +42,42 @@ const resolvers = {
   
 
   Mutation: {
-    login: async (parent, args, context, info) => {
-      const user = await User.findOne({ $or: [{ username: args.username }, { email: args.email }] });
-      if (!user) {
-        throw new Error("Can't find this user");
-      }
-      const correctPw = await user.isCorrectPassword(args.password);
-      if (!correctPw) {
-        throw new Error('Wrong password!');
-      }
-      const token = signToken(user);
-      return { token, user };
-    },
-    addUser: async (parent, args, context, info) => {
+    addUser: async (parent, args) => {
       const user = await User.create(args);
+      const token = signToken(user);
+      return { token, user };
+    },
+    
+    login: async (parent, { email, password }) => {
+      const user = await User.findOne({ email });
       if (!user) {
-        throw new Error('Something is wrong!');
+        throw new AuthenticationError('Incorrect credentials');
+      }
+      const correctPw = await user.isCorrectPassword(password);
+      if (!correctPw) {
+        throw new AuthenticationError('Incorrect credentials');
       }
       const token = signToken(user);
       return { token, user };
     },
-    saveBook: async (parent, args, context, info) => {
-      const updatedUser = await User.findOneAndUpdate(
-        { _id: args.userId },
-        { $addToSet: { savedBooks: args.bookId } },
-        { new: true, runValidators: true }
-      );
-      if (!updatedUser) {
-        throw new Error("Couldn't update the user");
+    saveBook: async (parent, { bookData }, context) => {
+      if (context.user) {
+        const updatedUser = await User.findOneAndUpdate(
+          { _id: context.user._id },
+          { $addToSet: { savedBooks: bookData } },
+          { new: true, runValidators: true }
+        );
+        
+        if (!updatedUser) {
+          throw new Error("Couldn't update the user");
+        }
+        
+        return updatedUser;
       }
-      return updatedUser;
+    
+      throw new Error('You need to be logged in!');
     },
+    
     removeBook: async (parent, args, context, info) => {
       const updatedUser = await User.findOneAndUpdate(
         { _id: args.userId },

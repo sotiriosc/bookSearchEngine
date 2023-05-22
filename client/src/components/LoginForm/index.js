@@ -24,16 +24,19 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
-
+  
     try {
-      await login({ variables: { ...userFormData } });
+      const { data } = await login({ variables: { ...userFormData } });
+  
+      // clear form data only if login is successful
+      setUserFormData({ email: '', password: '' });
+  
     } catch (e) {
       console.error(e);
       setShowAlert(true);
     }
-    
-    setUserFormData({ email: '', password: '' });
   };
+  
 
   return (
     <>

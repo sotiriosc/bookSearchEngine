@@ -18,7 +18,7 @@ const SearchBooks = () => {
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
-  const [searchInput, setSearchInput] = useState('Star Wars');
+  const [searchInput, setSearchInput] = useState('');
 
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
@@ -30,28 +30,31 @@ const SearchBooks = () => {
 
   const [saveBook] = useMutation(SAVE_BOOK);
   const [searchBooks, { data: searchBooksData }] = useLazyQuery(SEARCH_BOOKS);
-
+  
   useEffect(() => {
     if (searchBooksData) {
       setSearchedBooks(searchBooksData.searchBooks);
     }
   }, [searchBooksData]);
-
+  
   // create function to handle saving a book to our database
-  const handleSaveBook = async (bookId) => {
-    // find the book in `searchedBooks` state by the matching id
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
+  const handleSaveBook = async (bookData) => {
+    const { bookId, authors, description, title, image } = bookData;
+  
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
 
+    console.log("Token before send: ", token);
+  
     if (!token) {
       return false;
     }
-
+  
     try {
       await saveBook({
-        variables: { book: bookToSave },
+        variables: {
+          bookData: { bookId, authors, description, title, image }
+        },
         update: (cache) => {
           cache.writeQuery({
             query: SEARCH_BOOKS,
@@ -59,13 +62,15 @@ const SearchBooks = () => {
           });
         },
       });
-
+  
       // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      setSavedBookIds([...savedBookIds, bookId]);
     } catch (err) {
       console.error(err);
     }
   };
+  
+  
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -125,14 +130,16 @@ const SearchBooks = () => {
                     <Card.Text as='div'>
                       <strong>Description:</strong> {book.description}
                     </Card.Text>
+                    
                     <Button
                       disabled={savedBookIds?.some((savedBookId) => savedBookId === book.bookId)}
                       className='btn-block btn-info'
-                      onClick={() => handleSaveBook(book.bookId)}>
+                      onClick={() => handleSaveBook(book)}> {/* Pass the entire book object */}
                       {savedBookIds?.some((savedBookId) => savedBookId === book.bookId)
-                        ? 'This book has already been saved!'
-                        : 'Save this Book!'}
-                    </Button>
+                     ? 'This book has already been saved!'
+                      : 'Save this Book!'}
+                  </Button>
+
                   </Card.Body>
                 </Card>
               </Col>
