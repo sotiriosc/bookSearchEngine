@@ -37,6 +37,15 @@ const resolvers = {
         throw new Error('Failed to fetch book data from the external API.');
       }
     },
+
+    me: async (parent, args, context, info) => {
+      if (!context.user) throw new AuthenticationError('You need to be logged in!');
+      
+      // This line fetches the user who is currently logged in
+      const currentUser = await User.findOne({ _id: context.user._id });
+      
+      return currentUser;
+    },
   },
 
   
