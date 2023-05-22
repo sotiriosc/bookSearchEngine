@@ -7,17 +7,13 @@ import SavedBooks from './pages/SavedBooks';
 import Navbar from './components/Navbar';
 
 const client = new ApolloClient({
-  uri: 'http://localhost:3001/graphql', // Update the URL to your server's URL
+  uri: 'http://localhost:3001/graphql',
   cache: new InMemoryCache(),
-  request: (operation) => {
-    const token = localStorage.getItem('token');
-    operation.setContext({
-      headers: {
-        Authorization: token ? `Bearer ${token}` : '',
-      },
-    });
-  },
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('id_token')}`
+  }
 });
+
 
 function App() {
   return (

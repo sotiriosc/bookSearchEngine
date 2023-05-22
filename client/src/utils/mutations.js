@@ -46,7 +46,7 @@ export const DELETE_BOOK = gql`
         description
         title
         image
-        link
+
       }
     }
   }
@@ -65,7 +65,6 @@ export const REMOVE_BOOK = gql`
         description
         title
         image
-        link
       }
     }
   }
