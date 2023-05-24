@@ -51,7 +51,7 @@ Create an account, search for books and save the books you have an interest in.
 
 ## Contribution:
 
-Anyone is free to contribute.
+Anyone is free to contribute, use or copy the code for this app and is free to claim as their own. 
 
 ## Tests:
 
