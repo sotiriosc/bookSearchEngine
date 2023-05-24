@@ -9,7 +9,7 @@ import Navbar from './components/Navbar';
 
 // The ApolloProvider component wraps the entire application and allows us to share data between all of the components that we will create
 const client = new ApolloClient({
-  uri: 'https://lit-brushlands-53540.herokuapp.com/',
+  uri: '/graphql',
   cache: new InMemoryCache(),
   headers: {
     Authorization: `Bearer ${localStorage.getItem('id_token')}`
