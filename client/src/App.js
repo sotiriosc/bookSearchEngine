@@ -9,7 +9,7 @@ import Navbar from './components/Navbar';
 
 // The ApolloProvider component wraps the entire application and allows us to share data between all of the components that we will create
 const client = new ApolloClient({
-  uri: 'mongodb+srv://chortogiannoss:1q2w3e4r@cluster0.9wuptmd.mongodb.net/cluster0?retryWrites=true&w=majority',
+  uri: 'mongodb+srv://chortogiannoss:1q2w3e4r@cluster0.9wuptmd.mongodb.net/tech-freinds?retryWrites=true&w=majority',
   cache: new InMemoryCache(),
   headers: {
     Authorization: `Bearer ${localStorage.getItem('id_token')}`
